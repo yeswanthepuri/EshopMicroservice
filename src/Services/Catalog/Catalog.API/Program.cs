@@ -1,12 +1,10 @@
-using Marten;
-
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCarter();
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssembly(typeof(Program).Assembly);
 });
-builder.Services.AddMarten(opt=>
+builder.Services.AddMarten(opt =>
 {
     opt.Connection(builder.Configuration.GetConnectionString("Database")!);
 }).UseLightweightSessions();
