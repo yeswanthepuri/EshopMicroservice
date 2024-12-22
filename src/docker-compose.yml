@@ -1,16 +1,23 @@
 services:
  catalogdb:
   image: postgres
+  networks:
+    - app_network
  pgadmin:
   image: dpage/pgadmin4
+
+ catalog.api:
+   image: ${DOCKER_REGISTRY-}catalogapi
+   build:
+     context: .
+     dockerfile: Services/Catalog/Catalog.API/Dockerfile
+   networks:
+    - app_network
 
 volumes:
   postgres_catalog:
   pgadmin_admin:
 
-
-  # catalog.api:
-  #   image: ${DOCKER_REGISTRY-}catalogapi
-  #   build:
-  #     context: .
-  #     dockerfile: Services/Catalog/Catalog.API/Dockerfile
+networks:
+  app_network:
+   driver: bridge
