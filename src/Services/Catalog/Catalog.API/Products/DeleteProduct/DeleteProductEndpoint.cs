@@ -1,5 +1,4 @@
 ﻿
-using Mapster;
 using static Catalog.API.Products.UpdateProduct.UpdateProductEndpoint;
 
 namespace Catalog.API.Products.DeleteProduct
