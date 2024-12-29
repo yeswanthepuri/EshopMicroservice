@@ -1,4 +1,5 @@
-﻿using Basket.API.Models;
+﻿using Basket.API.Data;
+using Basket.API.Models;
 using BuildingBlocks.CQRS;
 
 namespace Basket.API.Basket.StoreBasket
@@ -13,14 +14,14 @@ namespace Basket.API.Basket.StoreBasket
             RuleFor(x => x.Cart).NotNull().WithMessage("Cart can't be null");
             RuleFor(x => x.Cart.UserName).NotNull().WithMessage("User is Required");
         }
-        public class StoreBasketCommandHandler : ICommandHandler<StoreBasketCommand, StoreBasketResult>
+        public class StoreBasketCommandHandler(IBasketRepository basketRepository) : ICommandHandler<StoreBasketCommand, StoreBasketResult>
         {
             public async Task<StoreBasketResult> Handle(StoreBasketCommand command, CancellationToken cancellationToken)
             {
                 ShoppingCart cart = command.Cart;
-                //TODO DB
+                await basketRepository.StoreBasket(cart, cancellationToken);
                 //TODO cache
-                return new StoreBasketResult("Yeswanth");
+                return new StoreBasketResult(cart.UserName);
             }
         }
     }

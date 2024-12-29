@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.CQRS;
+using Catalog.API.Exceptions;
 using Catalog.API.Models;
 using Catalog.API.Products.CreateProduct;
 using Marten;

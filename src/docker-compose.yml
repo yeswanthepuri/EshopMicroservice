@@ -3,6 +3,14 @@ services:
   image: postgres
   networks:
     - app_network
+ basketdb:
+  image: postgres
+  networks:
+    - app_network
+ distributedcache:
+  image: redis
+  networks:
+    - app_network
  pgadmin:
   image: dpage/pgadmin4
 
@@ -13,11 +21,21 @@ services:
      dockerfile: Services/Catalog/Catalog.API/Dockerfile
    networks:
     - app_network
+ basket.api:
+    image: ${DOCKER_REGISTRY-}basketapi
+    build:
+      context: .
+      dockerfile: Services/Basket/Basket.API/Dockerfile
+    networks:
+    - app_network
 
 volumes:
   postgres_catalog:
+  postgres_basket:
   pgadmin_admin:
+  container_name:
 
 networks:
   app_network:
    driver: bridge
+
