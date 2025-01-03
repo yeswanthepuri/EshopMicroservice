@@ -7,60 +7,60 @@ using Microsoft.Extensions.Logging;
 
 namespace BuildingBlocks.Exceptions.Handler
 {
-    public class CustomExceptionHandler(ILogger<CustomExceptionHandler> logger) : IExceptionHandler
-    {
-
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+        public class CustomExceptionHandler(ILogger<CustomExceptionHandler> logger) : IExceptionHandler
         {
-            logger.LogError("Error Message {exceptionMessage}, Time of the occurence {time}", exception.Message, DateTime.Now);
-            (string Details, string Title, int StatusCode) details = exception switch
-            {
-                InternalServerException =>
-                (
-                exception.Message,
-                exception.GetType().Name,
-                httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError
-                ),
-                ValidationException =>
-                (
-                exception.Message,
-                exception.GetType().Name,
-                httpContext.Response.StatusCode = StatusCodes.Status400BadRequest
-                ),
-                BadRequestException =>
-                (
-                exception.Message,
-                exception.GetType().Name,
-                httpContext.Response.StatusCode = StatusCodes.Status400BadRequest
-                ),
-                NotFoundException =>
-                (
-                exception.Message,
-                exception.GetType().Name,
-                httpContext.Response.StatusCode = StatusCodes.Status404NotFound
-                ),
-                _ => (
-                exception.Message,
-                exception.GetType().Name,
-                httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError
-                )
-            };
-            var problemDetails = new ProblemDetails
-            {
-                Title = details.Title,
-                Detail = details.Details,
-                Status = details.StatusCode,
-                Instance = httpContext.Request.Path
-            };
-            problemDetails.Extensions.Add("traceId",httpContext.TraceIdentifier);
 
-            if(exception is ValidationException validationException)
+            public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
             {
-                problemDetails.Extensions.Add("ValidationError", validationException.Errors);
+                logger.LogError("Error Message {exceptionMessage}, Time of the occurence {time}", exception.Message, DateTime.Now);
+                (string Details, string Title, int StatusCode) details = exception switch
+                {
+                    InternalServerException =>
+                    (
+                    exception.Message,
+                    exception.GetType().Name,
+                    httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError
+                    ),
+                    ValidationException =>
+                    (
+                    exception.Message,
+                    exception.GetType().Name,
+                    httpContext.Response.StatusCode = StatusCodes.Status400BadRequest
+                    ),
+                    BadRequestException =>
+                    (
+                    exception.Message,
+                    exception.GetType().Name,
+                    httpContext.Response.StatusCode = StatusCodes.Status400BadRequest
+                    ),
+                    NotFoundException =>
+                    (
+                    exception.Message,
+                    exception.GetType().Name,
+                    httpContext.Response.StatusCode = StatusCodes.Status404NotFound
+                    ),
+                    _ => (
+                    exception.Message,
+                    exception.GetType().Name,
+                    httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError
+                    )
+                };
+                var problemDetails = new ProblemDetails
+                {
+                    Title = details.Title,
+                    Detail = details.Details,
+                    Status = details.StatusCode,
+                    Instance = httpContext.Request.Path
+                };
+                problemDetails.Extensions.Add("traceId",httpContext.TraceIdentifier);
+
+                if(exception is ValidationException validationException)
+                {
+                    problemDetails.Extensions.Add("ValidationError", validationException.Errors);
+                }
+                await httpContext.Response.WriteAsJsonAsync( problemDetails,cancellationToken );
+
+                return true;
             }
-            await httpContext.Response.WriteAsJsonAsync( problemDetails,cancellationToken );
-
-            return true;
         }
-    }
 }
