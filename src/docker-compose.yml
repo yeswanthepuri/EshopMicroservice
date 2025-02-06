@@ -28,6 +28,13 @@ services:
       dockerfile: Services/Basket/Basket.API/Dockerfile
     networks:
     - app_network
+ discount.grpc:
+    image: ${DOCKER_REGISTRY-}discountgrpc
+    build:
+      context: .
+      dockerfile: Services/Discount/Discount.Grpc/Dockerfile
+    networks:
+    - app_network
 
 volumes:
   postgres_catalog:
@@ -38,4 +45,5 @@ volumes:
 networks:
   app_network:
    driver: bridge
+
 

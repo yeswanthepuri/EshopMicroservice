@@ -1,5 +1,6 @@
 using Basket.API.Data;
 using BuildingBlocks.Exceptions.Handler;
+using Discount.Grpc;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
@@ -12,12 +13,14 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod()
     );
 });
+//Application services
 builder.Services.AddCarter();
 builder.Services.AddMarten(opt =>
 {
     opt.Connection(builder.Configuration.GetConnectionString("Database")!);
 }).UseLightweightSessions();
-builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+
+//Data Services
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssembly(typeof(Program).Assembly);
@@ -28,16 +31,39 @@ builder.Services.AddMarten(opt =>
     opt.Connection(builder.Configuration.GetConnectionString("Database")!);
     opt.Schema.For<ShoppingCart>().Identity(x => x.UserName);
 }).UseLightweightSessions();
-builder.Services.AddScoped<IBasketRepository, BasketRepository>();
-builder.Services.Decorate<IBasketRepository, CachedBasketRepository>();
-
-builder.Services.AddStackExchangeRedisCache(opt => {
+builder.Services.AddStackExchangeRedisCache(opt =>
+{
     opt.Configuration = builder.Configuration.GetConnectionString("Redis");
     opt.InstanceName = "Basket";
 });
+builder.Services.AddScoped<IBasketRepository, BasketRepository>();
+builder.Services.Decorate<IBasketRepository, CachedBasketRepository>();
+//Grpc Services
+var url = builder.Configuration["GrpcSettings:DiscountUrl"];
+builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(
+    opt =>
+    {
+        opt.Address = new Uri(url);
+    })
+    .ConfigurePrimaryHttpMessageHandler
+    (() =>
+    {
+        var handler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
+        };
+        return handler;
+    })
+    ;
+
+
+
+//Cross Cutting Services
 builder.Services.AddHealthChecks()
     .AddNpgSql(builder.Configuration.GetConnectionString("Database")!)
     .AddRedis(builder.Configuration.GetConnectionString("Redis")!);
+builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+
 var app = builder.Build();
 app.UseCors("AllowAngularApp");
 //Configer the HTTP request pipeline
