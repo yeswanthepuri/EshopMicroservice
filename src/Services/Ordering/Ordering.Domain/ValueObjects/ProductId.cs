@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Ordering.Domain.ValueObjects
 {
-    public record ProducId
+    public record ProductId
     {
         public Guid Value { get; set; }
-        private ProducId(Guid value) => Value = value;
+        private ProductId(Guid value) => Value = value;
 
-        public static ProducId Of(Guid value)
+        public static ProductId Of(Guid value)
         {
             ArgumentNullException.ThrowIfNull(value);
 
@@ -20,7 +20,7 @@ namespace Ordering.Domain.ValueObjects
                 throw new DomainException("ProducId can't be empty");
             }
 
-            return new ProducId(value);
+            return new ProductId(value);
         }
     }
 }

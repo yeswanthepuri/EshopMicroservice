@@ -7,6 +7,10 @@ namespace Ordering.Domain.Models
 {
     public class Order : AggregateBase<OrderId>
     {
+        protected Order()
+        {
+
+        }
         private readonly List<OrderItem> _orderItems = new();
 
         public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
@@ -55,7 +59,6 @@ namespace Ordering.Domain.Models
             return order;
         }
         public void  Update(
-           CustomerId customerId,
            OrderName orderName,
            Address shippingAddress,
            Address billingAddress,
@@ -64,7 +67,6 @@ namespace Ordering.Domain.Models
            )
         {
 
-            CustomerId = customerId;
             OrderName = orderName;
             ShippingAddress = shippingAddress;
             BillingAddress = billingAddress;
@@ -74,7 +76,7 @@ namespace Ordering.Domain.Models
             AddDominaEvent(new OrderUpdateEvent(this));
         }
 
-        public void Add(ProducId producId,int quantity, decimal price)
+        public void Add(ProductId producId,int quantity, decimal price)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
@@ -83,7 +85,7 @@ namespace Ordering.Domain.Models
 
             _orderItems.Add(orderItem);
         }
-        public void Remove(ProducId producId)
+        public void Remove(ProductId producId)
         {
             var orderItem = _orderItems.FirstOrDefault(x=>x.ProductId == producId);
             if (orderItem != null)

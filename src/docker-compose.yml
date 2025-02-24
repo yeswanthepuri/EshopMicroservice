@@ -1,18 +1,27 @@
 services:
+
  catalogdb:
   image: postgres
   networks:
     - app_network
+
  basketdb:
   image: postgres
   networks:
     - app_network
+
  distributedcache:
   image: redis
   networks:
     - app_network
+
  pgadmin:
   image: dpage/pgadmin4
+
+ orderdb:
+   image: mcr.microsoft.com/mssql/server:2022-latest
+   networks:
+    - app_network
 
  catalog.api:
    image: ${DOCKER_REGISTRY-}catalogapi
@@ -41,6 +50,7 @@ volumes:
   postgres_basket:
   pgadmin_admin:
   container_name:
+  sql_orderdb:
 
 networks:
   app_network:

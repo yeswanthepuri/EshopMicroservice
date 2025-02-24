@@ -8,7 +8,7 @@ namespace Ordering.Domain.ValueObjects
         public string CardNumber { get; private set; } = default!;
         public string CardExpiration { get; private set; } = default!;
         public string CVV { get; private set; } = default!;
-        public string PaymentMethod { get; private set; } = default!;
+        public int PaymentMethod { get; private set; } = default!;
 
         protected Payment()
         { }
@@ -16,7 +16,7 @@ namespace Ordering.Domain.ValueObjects
             string cardNumber,
             string cardExpiration,
             string cvv,
-            string paymentMethod
+            int paymentMethod
             )
         {
             CardExpiration = cardExpiration;
@@ -31,7 +31,7 @@ namespace Ordering.Domain.ValueObjects
             string cardNumber,
             string cardExpiration,
             string cvv,
-            string paymentMethod)
+            int paymentMethod)
         {
 
             ArgumentException.ThrowIfNullOrWhiteSpace(cardName);
